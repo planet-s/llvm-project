@@ -19,6 +19,11 @@
 #include "Unix.h"
 #include <limits.h>
 #include <stdio.h>
+#if defined(__redox__)
+#include <fstream>
+#include <sstream>
+#include <sys/redox.h>
+#endif
 #if HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
@@ -85,7 +90,7 @@
 #define STATVFS_F_FRSIZE(vfs) static_cast<uint64_t>(vfs.f_bsize)
 #endif
 
-#if defined(__NetBSD__) || defined(__DragonFly__) || defined(__GNU__)
+#if defined(__NetBSD__) || defined(__DragonFly__) || defined(__GNU__) || defined(__redox__)
 #define STATVFS_F_FLAG(vfs) (vfs).f_flag
 #else
 #define STATVFS_F_FLAG(vfs) (vfs).f_flags
@@ -222,6 +227,11 @@ std::string getMainExecutable(const char *argv0, void *MainAddr) {
   char link_path[MAXPATHLEN];
   if (realpath(DLInfo.dli_fname, link_path))
     return link_path;
+#elif defined(__redox__)
+  std::ifstream file("sys:exe");
+  std::stringstream buf;
+  buf << file.rdbuf();
+  return buf.str();
 #else
 #error GetMainExecutable is not implemented on this host yet.
 #endif
@@ -400,6 +410,9 @@ static bool is_local_impl(struct STATVFS &Vfs) {
   return true;
 #elif defined(__HAIKU__)
   // Haiku doesn't expose this information.
+  return false;
+#elif defined(__redox__)
+  // Redox doesn't expose this information.
   return false;
 #elif defined(__sun)
   // statvfs::f_basetype contains a null-terminated FSType name of the mounted target
@@ -875,7 +888,13 @@ std::error_code openFileForRead(const Twine &Name, int &ResultFD,
   if(!RealPath)
     return std::error_code();
   RealPath->clear();
-#if defined(F_GETPATH)
+#if defined(__redox__)
+  // When F_GETPATH is availble, it is the quickest way to get
+  // the real path name.
+  char Buffer[MAXPATHLEN];
+  if (::redox_fpath(ResultFD, Buffer, MAXPATHLEN) != -1)
+    RealPath->append(Buffer, Buffer + strlen(Buffer));
+#elif defined(F_GETPATH)
   // When F_GETPATH is availble, it is the quickest way to get
   // the real path name.
   char Buffer[MAXPATHLEN];
