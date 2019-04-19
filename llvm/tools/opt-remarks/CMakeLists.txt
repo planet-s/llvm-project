@@ -8,7 +8,7 @@ set(SOURCES
 
 set(LLVM_EXPORTED_SYMBOL_FILE ${CMAKE_CURRENT_SOURCE_DIR}/OptRemarks.exports)
 
-add_llvm_library(OptRemarks SHARED ${SOURCES})
+add_llvm_library(OptRemarks ${SOURCES})
 
 install(FILES ${LLVM_MAIN_INCLUDE_DIR}/llvm-c/OptRemarks.h
   DESTINATION include/llvm-c

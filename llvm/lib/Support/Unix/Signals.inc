@@ -47,7 +47,11 @@
 #include "llvm/Support/raw_ostream.h"
 #include <algorithm>
 #include <string>
+#if defined(__redox__)
+#define EX_IOERR 74
+#else
 #include <sysexits.h>
+#endif
 #ifdef HAVE_BACKTRACE
 # include BACKTRACE_HEADER         // For backtrace().
 #endif
