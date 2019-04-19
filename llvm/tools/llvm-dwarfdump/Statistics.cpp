@@ -569,10 +569,10 @@ bool collectStatsForObjectFile(ObjectFile &Obj, DWARFContext &DICtx,
   OS << "}\n";
   LLVM_DEBUG(
       llvm::dbgs() << "Total Availability: "
-                   << (int)std::round((VarParamWithLoc * 100.0) / VarParamTotal)
+                   << (int)::round((VarParamWithLoc * 100.0) / VarParamTotal)
                    << "%\n";
       llvm::dbgs() << "PC Ranges covered: "
-                   << (int)std::round((GlobalStats.ScopeBytesCovered * 100.0) /
+                   << (int)::round((GlobalStats.ScopeBytesCovered * 100.0) /
                                       GlobalStats.ScopeBytes)
                    << "%\n");
   return true;

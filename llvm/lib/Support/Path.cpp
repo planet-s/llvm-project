@@ -258,8 +258,13 @@ const_iterator &const_iterator::operator++() {
   if (is_separator(Path[Position], S)) {
     // Root dir.
     if (was_net ||
+    #if defined(__redox__)
+        Component.endswith(":")
+    #else
         // c:/
-        (real_style(S) == Style::windows && Component.endswith(":"))) {
+        (real_style(S) == Style::windows && Component.endswith(":"))
+    #endif
+    ) {
       Component = Path.substr(Position, 1);
       return *this;
     }
@@ -348,7 +353,11 @@ StringRef root_path(StringRef path, Style style) {
   if (b != e) {
     bool has_net =
         b->size() > 2 && is_separator((*b)[0], style) && (*b)[1] == (*b)[0];
+    #if defined(__redox__)
+    bool has_drive = b->endswith(":");
+    #else
     bool has_drive = (real_style(style) == Style::windows) && b->endswith(":");
+    #endif
 
     if (has_net || has_drive) {
       if ((++pos != e) && is_separator((*pos)[0], style)) {
@@ -374,7 +383,11 @@ StringRef root_name(StringRef path, Style style) {
   if (b != e) {
     bool has_net =
         b->size() > 2 && is_separator((*b)[0], style) && (*b)[1] == (*b)[0];
+    #if defined(__redox__)
+    bool has_drive = b->endswith(":");
+    #else
     bool has_drive = (real_style(style) == Style::windows) && b->endswith(":");
+    #endif
 
     if (has_net || has_drive) {
       // just {C:,//net}, return the first component.
@@ -391,7 +404,11 @@ StringRef root_directory(StringRef path, Style style) {
   if (b != e) {
     bool has_net =
         b->size() > 2 && is_separator((*b)[0], style) && (*b)[1] == (*b)[0];
+    #if defined(__redox__)
+    bool has_drive = b->endswith(":");
+    #else
     bool has_drive = (real_style(style) == Style::windows) && b->endswith(":");
+    #endif
 
     if ((has_net || has_drive) &&
         // {C:,//net}, skip to the next component.
