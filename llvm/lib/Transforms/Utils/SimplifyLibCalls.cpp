@@ -201,7 +201,7 @@ static void annotateDereferenceableBytes(CallInst *CI,
       DerefBytes = std::max(CI->getDereferenceableOrNullBytes(
                                 ArgNo + AttributeList::FirstArgIndex),
                             DereferenceableBytes);
-  
+
     if (CI->getDereferenceableBytes(ArgNo + AttributeList::FirstArgIndex) <
         DerefBytes) {
       CI->removeParamAttr(ArgNo, Attribute::Dereferenceable);
@@ -550,7 +550,7 @@ Value *LibCallSimplifier::optimizeStrCpy(CallInst *CI, IRBuilder<> &B) {
   Value *Dst = CI->getArgOperand(0), *Src = CI->getArgOperand(1);
   if (Dst == Src) // strcpy(x,x)  -> x
     return Src;
-  
+
   annotateNonNullBasedOnAccess(CI, {0, 1});
   // See if we can get the length of the input string.
   uint64_t Len = GetStringLength(Src);
@@ -1593,9 +1593,9 @@ Value *LibCallSimplifier::replacePowWithExp(CallInst *Pow, IRBuilder<> &B) {
       Pow->hasNoInfs() && BaseF->isNormal() && !BaseF->isNegative()) {
     Value *Log = nullptr;
     if (Ty->isFloatTy())
-      Log = ConstantFP::get(Ty, std::log2(BaseF->convertToFloat()));
+      Log = ConstantFP::get(Ty, ::log2(BaseF->convertToFloat()));
     else if (Ty->isDoubleTy())
-      Log = ConstantFP::get(Ty, std::log2(BaseF->convertToDouble()));
+      Log = ConstantFP::get(Ty, ::log2(BaseF->convertToDouble()));
 
     if (Log) {
       Value *FMul = B.CreateFMul(Log, Expo, "mul");
