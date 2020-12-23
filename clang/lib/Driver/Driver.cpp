@@ -84,7 +84,11 @@
 #include <utility>
 #if LLVM_ON_UNIX
 #include <unistd.h> // getpid
+#if defined(__redox__)
+#define EX_IOERR 74
+#else
 #include <sysexits.h> // EX_IOERR
+#endif
 #endif
 
 using namespace clang::driver;

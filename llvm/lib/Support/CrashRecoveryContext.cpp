@@ -15,7 +15,11 @@
 #include <mutex>
 #include <setjmp.h>
 #if LLVM_ON_UNIX
+#if defined(__redox__)
+#define EX_IOERR 74
+#else
 #include <sysexits.h> // EX_IOERR
+#endif
 #endif
 
 using namespace llvm;
